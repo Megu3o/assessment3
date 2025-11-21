@@ -49,56 +49,69 @@ export default function ApodDetailsPage() {
   }, [date]);
 
   return (
-    <section className="section">
-      <div className="container">
+    <section className="py-8 md:py-10">
+      <div className="mx-auto max-w-4xl px-4">
+        {/* Back button */}
         <div className="mb-4">
-          <Link href="/nasa-api" className="button is-light">
+          <Link
+            href="/nasa-api"
+            className="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900"
+          >
             &larr; Back to NASA API
           </Link>
         </div>
 
+        {/* No date selected */}
         {!date && (
-          <p className="has-text-danger">
+          <p className="text-sm text-red-600">
             No date supplied. Please choose an item from the NASA API page.
           </p>
         )}
 
+        {/* Loading state */}
         {isLoading && (
-          <div className="has-text-centered">
-            <div className="loader is-loading"></div>
-            <p>Loading details...</p>
+          <div className="flex flex-col items-center justify-center gap-2 py-10">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-slate-600" />
+            <p className="text-sm text-slate-600">Loading details...</p>
           </div>
         )}
 
-        {error && <p className="has-text-danger">{error}</p>}
+        {/* Error message */}
+        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
+        {/* APOD content */}
         {apodData && !error && (
-          <div className="box">
-            <h1 className="title is-3">{apodData.title}</h1>
-            <p className="subtitle is-6">{apodData.date}</p>
+          <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+              {apodData.title}
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">{apodData.date}</p>
 
             {apodData.media_type === "image" ? (
-              <figure className="image is-4by3">
+              <div className="mt-4 overflow-hidden rounded-lg">
                 <Image
                   src={apodData.url}
                   alt={apodData.title}
                   width={800}
                   height={600}
                   unoptimized
-                  style={{ width: "100%", height: "auto" }}
+                  className="h-auto w-full"
                 />
-              </figure>
+              </div>
             ) : (
-              <div className="video-container">
+              <div className="mt-4 aspect-video w-full overflow-hidden rounded-lg">
                 <iframe
                   src={apodData.url}
                   title={`APOD video for ${apodData.title}`}
+                  className="h-full w-full"
                   allowFullScreen
                 ></iframe>
               </div>
             )}
 
-            <p className="mt-4">{apodData.explanation}</p>
+            <p className="mt-4 text-sm leading-relaxed text-slate-700">
+              {apodData.explanation}
+            </p>
           </div>
         )}
       </div>
