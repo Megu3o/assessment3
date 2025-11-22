@@ -38,6 +38,12 @@ export default function RootLayout({ children }) {
                 Home
               </Link>
               <Link
+                href="/project"
+                className="hover:text-emerald-300 transition-colors"
+              >
+                Project
+              </Link>
+              <Link
                 href="/nasa-api"
                 className="hover:text-emerald-300 transition-colors"
               >
