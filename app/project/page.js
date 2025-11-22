@@ -1,8 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import api from "../../lib/api";
+import ProjectForm from "./components/ProjectForm";
+import ProjectCard from "./components/ProjectCard";
+import StatusMessage from "./components/StatusMessage";
+import LoadingText from "./components/LoadingText";
+
 
 // Simple helper to wait for a given time (ms)
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -10,7 +14,7 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
   const [form, setForm] = useState({ name: "", description: "" });
-  const [editing, setEditing] = useState(null); 
+  const [editing, setEditing] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +42,11 @@ export default function ProjectsPage() {
   useEffect(() => {
     loadProjects("Projects loaded successfully.");
   }, []);
+
+  // Handle form input change
+  const handleFormChange = (field, value) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
 
   // Create or update a project
   const handleSubmit = async (e) => {
@@ -83,6 +92,14 @@ export default function ProjectsPage() {
     setError("");
   };
 
+  // Cancel editing
+  const handleCancelEdit = () => {
+    setEditing(null);
+    setForm({ name: "", description: "" });
+    setSuccess("");
+    setError("");
+  };
+
   // Delete a project
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this project?")) return;
@@ -109,118 +126,31 @@ export default function ProjectsPage() {
       <h1 className="mb-4 text-2xl font-bold">Projects</h1>
 
       {/* Status messages */}
-      {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          <p className="font-semibold">Unable to complete the action</p>
-          <p>{error}</p>
-        </div>
-      )}
-      {!error && success && (
-        <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
-          <p className="font-semibold">Success</p>
-          <p>{success}</p>
-        </div>
-      )}
+      <StatusMessage error={error} success={success} />
 
-      {/* Project form */}
-      <form
+
+      {/* Project form (ProjectForm component)*/}
+      <ProjectForm
+        form={form}
+        isLoading={isLoading}
+        editing={editing}
+        onChange={handleFormChange}
         onSubmit={handleSubmit}
-        className="mb-6 space-y-4 rounded-lg border bg-white p-4 shadow-sm"
-      >
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-gray-700">
-            Project Name
-          </label>
-          <input
-            type="text"
-            placeholder="Enter a project name"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="rounded border border-gray-300 p-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            required
-          />
-        </div>
+        onCancel={handleCancelEdit}
+      />
 
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-gray-700">
-            Description
-          </label>
-          <textarea
-            placeholder="Describe the project (optional)"
-            value={form.description}
-            onChange={(e) =>
-              setForm({ ...form, description: e.target.value })
-            }
-            className="rounded border border-gray-300 p-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            rows={3}
-          />
-        </div>
+      {/* Loading indicator (LoadingText component) */}
+      <LoadingText isLoading={isLoading} text="Loading projects..." />
 
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="submit"
-            className="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
-            disabled={isLoading}
-          >
-            {editing ? "Update Project" : "Add Project"}
-          </button>
-
-          {editing && (
-            <button
-              type="button"
-              onClick={() => {
-                setEditing(null);
-                setForm({ name: "", description: "" });
-                setSuccess("");
-                setError("");
-              }}
-              className="rounded bg-gray-400 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-500 disabled:opacity-60"
-              disabled={isLoading}
-            >
-              Cancel
-            </button>
-          )}
-        </div>
-      </form>
-
-      {/* Loading indicator */}
-      {isLoading && (
-        <p className="mb-2 text-sm text-gray-500">Loading projects...</p>
-      )}
-
-      {/* Project cards */}
+      {/* Project cards (ProjectCard component) */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {projects.map((project) => (
-          <div
+          <ProjectCard
             key={project.id}
-            className="rounded border p-4 shadow transition hover:shadow-md"
-          >
-            <Link
-              href={`/projects/${project.id}`}
-              className="text-lg font-semibold text-blue-600 hover:underline"
-            >
-              {project.name}
-            </Link>
-            <p className="mb-2 text-sm text-gray-600">
-              {project.description || "No description"}
-            </p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => handleEdit(project)}
-                className="rounded bg-yellow-500 px-3 py-1 text-xs font-semibold text-white hover:bg-yellow-600"
-              >
-                Edit
-              </button>
-              <button
-                type="button"
-                onClick={() => handleDelete(project.id)}
-                className="rounded bg-red-600 px-3 py-1 text-xs font-semibold text-white hover:bg-red-700"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
+            project={project}
+            onEdit={() => handleEdit(project)}
+            onDelete={() => handleDelete(project.id)}
+          />
         ))}
 
         {!isLoading && projects.length === 0 && !error && (
