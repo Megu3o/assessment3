@@ -14,7 +14,7 @@ export default function HomePage() {
         <div className="flex flex-col items-center justify-center gap-8 md:flex-row">
           {/* New Project */}
           <Link
-            href="/project"
+            href="/project/new"
             className="group w-full max-w-md h-56 rounded-3xl border border-blue-200 bg-blue-50 px-8 py-10 text-center transition hover:bg-blue-100 shadow-sm flex flex-col justify-center"
           >
             <div>
