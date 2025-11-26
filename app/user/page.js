@@ -17,7 +17,7 @@ export default function UsersPage() {
         setError("");
 
         const res = await api.get("/users");
-        const data = res.data.data || res.data || []; // Postman の形に合わせて安全に
+        const data = res.data.data || res.data || [];
 
         setUsers(data);
       } catch (err) {
