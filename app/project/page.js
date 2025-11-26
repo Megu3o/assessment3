@@ -1,32 +1,31 @@
+// app/project/page.js
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";  
 import api from "../../lib/api";
-import ProjectForm from "./components/ProjectForm";
 import ProjectCard from "./components/ProjectCard";
-import StatusMessage from "./components/StatusMessage";
-import LoadingText from "./components/LoadingText";
 
-
-// Simple helper to wait for a given time (ms)
-const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-export default function ProjectsPage() {
+export default function ProjectListPage() {
   const [projects, setProjects] = useState([]);
-  const [form, setForm] = useState({ name: "", description: "" });
-  const [editing, setEditing] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Load project list from the API
+  const router = useRouter(); 
+
   const loadProjects = async (message = "") => {
     try {
       setIsLoading(true);
       setError("");
+      if (!message) {
+        setSuccess("");
+      }
+
       const res = await api.get("/projects");
       const data = res.data.data || res.data || [];
       setProjects(data);
+
       if (message) {
         setSuccess(message);
       }
@@ -38,69 +37,11 @@ export default function ProjectsPage() {
     }
   };
 
-  // Load projects once when the page first renders
   useEffect(() => {
     loadProjects("Projects loaded successfully.");
   }, []);
 
-  // Handle form input change
-  const handleFormChange = (field, value) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  // Create or update a project
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      setError("");
-      setSuccess("");
-
-      if (editing) {
-        // Edit mode: update an existing project
-        await api.put(`/projects/${editing}`, form);
-
-        // Wait a bit for the backend to finish updating
-        await wait(500);
-
-        await loadProjects("Project updated successfully.");
-      } else {
-        // Create mode: create a new project
-        const res = await api.post("/projects", form);
-        console.log("POST /projects result:", res.data);
-
-        // Wait a bit for the backend to finish saving
-        await wait(500);
-
-        await loadProjects("Project created successfully.");
-      }
-
-      // Reset the form
-      setForm({ name: "", description: "" });
-      setEditing(null);
-    } catch (err) {
-      setError(err.message || "Error saving project.");
-      setSuccess("");
-    }
-  };
-
-  // When the Edit button is clicked, fill the form with that project
-  const handleEdit = (project) => {
-    setForm({ name: project.name, description: project.description });
-    setEditing(project.id);
-    setSuccess("");
-    setError("");
-  };
-
-  // Cancel editing
-  const handleCancelEdit = () => {
-    setEditing(null);
-    setForm({ name: "", description: "" });
-    setSuccess("");
-    setError("");
-  };
-
-  // Delete a project
+  // Delete handler
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this project?")) return;
 
@@ -110,10 +51,7 @@ export default function ProjectsPage() {
 
       await api.delete(`/projects/${id}`);
 
-      // Remove the deleted project from local state
-      const newList = projects.filter((p) => p.id !== id);
-      setProjects(newList);
-
+      setProjects((prev) => prev.filter((p) => p.id !== id));
       setSuccess("Project deleted successfully.");
     } catch (err) {
       setError(err.message || "Error deleting project.");
@@ -121,42 +59,52 @@ export default function ProjectsPage() {
     }
   };
 
+
+  const handleEdit = (id) => {
+    router.push(`/project/${id}`);
+  };
+
   return (
-    <div className="p-6">
-      <h1 className="mb-4 text-2xl font-bold">Projects</h1>
+    <main className="min-h-[80vh] bg-blue-50/60 px-20 py-10">
+      <div className="mx-auto w-full max-w-5xl">
+        <div className="mb-8 flex flex-col items-center gap-4">
+          <h1 className="text-4xl font-bold text-blue-900 text-center">
+            Projects
+          </h1>
+        </div>
 
-      {/* Status messages */}
-      <StatusMessage error={error} success={success} />
-
-
-      {/* Project form (ProjectForm component)*/}
-      <ProjectForm
-        form={form}
-        isLoading={isLoading}
-        editing={editing}
-        onChange={handleFormChange}
-        onSubmit={handleSubmit}
-        onCancel={handleCancelEdit}
-      />
-
-      {/* Loading indicator (LoadingText component) */}
-      <LoadingText isLoading={isLoading} text="Loading projects..." />
-
-      {/* Project cards (ProjectCard component) */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {projects.map((project) => (
-          <ProjectCard
-            key={project.id}
-            project={project}
-            onEdit={() => handleEdit(project)}
-            onDelete={() => handleDelete(project.id)}
-          />
-        ))}
-
-        {!isLoading && projects.length === 0 && !error && (
-          <p className="text-sm text-gray-500">No projects found.</p>
+        {error && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            <p className="font-semibold">Unable to load projects</p>
+            <p>{error}</p>
+          </div>
         )}
+        {!error && success && (
+          <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+            <p className="font-semibold">Success</p>
+            <p>{success}</p>
+          </div>
+        )}
+
+        {isLoading && (
+          <p className="mb-4 text-sm text-gray-600">Loading projects...</p>
+        )}
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {projects.map((project) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+              onEdit={() => handleEdit(project.id)} 
+              onDelete={() => handleDelete(project.id)}   
+            />
+          ))}
+
+          {!isLoading && !error && projects.length === 0 && (
+            <p className="text-sm text-gray-600">No projects found.</p>
+          )}
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

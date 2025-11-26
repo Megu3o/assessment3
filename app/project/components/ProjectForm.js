@@ -1,13 +1,15 @@
+// app/project/components/ProjectForm.js
 "use client";
 
 export default function ProjectForm({
   form,
   isLoading,
-  editing,
+  mode = "create", // "create" or "edit"
   onChange,
   onSubmit,
-  onCancel,
 }) {
+  const isEdit = mode === "edit";
+
   return (
     <form
       onSubmit={onSubmit}
@@ -46,19 +48,8 @@ export default function ProjectForm({
           className="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
           disabled={isLoading}
         >
-          {editing ? "Update Project" : "Add Project"}
+          {isEdit ? "Save" : "Add Project"}
         </button>
-
-        {editing && (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded bg-gray-400 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-500 disabled:opacity-60"
-            disabled={isLoading}
-          >
-            Cancel
-          </button>
-        )}
       </div>
     </form>
   );

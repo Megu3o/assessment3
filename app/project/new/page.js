@@ -37,8 +37,7 @@ export default function NewProjectPage() {
 
       await wait(2000); // 2sec
 
-
-      // 作成後に一覧ページへ
+      // go back to project page after creating a new project 
       router.push("/project");
     } catch (err) {
       setError(err.message || "Error creating project.");
@@ -48,11 +47,11 @@ export default function NewProjectPage() {
     }
   };
 
-  const handleCancel = () => {
-    setForm({ name: "", description: "" });
-    setError("");
-    setSuccess("");
-  };
+  // const handleCancel = () => {
+  //   setForm({ name: "", description: "" });
+  //   setError("");
+  //   setSuccess("");
+  // };
 
   return (
     <main className="min-h-[80vh] bg-blue-50/60 px-4 py-10 flex items-center justify-center">
@@ -84,7 +83,7 @@ export default function NewProjectPage() {
             isLoading={isLoading}
             onChange={handleFormChange}
             onSubmit={handleSubmit}
-            onCancel={handleCancel}
+            // onCancel={handleCancel}
           />
         </div>
       </div>
