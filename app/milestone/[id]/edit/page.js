@@ -1,8 +1,8 @@
 import EditMilestoneClient from "./EditMilestoneClient";
 import api from "../../../../lib/api";
 
-export default function EditMilestonePage({ params }) {
-  const { id } = params;
+export default async function EditMilestonePage({ params }) {
+  const { id } = await params;
   return <EditMilestoneClient id={id} />;
 }
 
@@ -19,8 +19,8 @@ export async function generateStaticParams() {
     const milestones = res.data.data || res.data || [];
 
     return milestones
-      .filter((m) => m?.id)
-      .map((m) => ({ id: m.id.toString() }));
+      .filter((milestone) => milestone?.id)
+      .map((milestone) => ({ id: milestone.id.toString() }));
   } catch (error) {
     console.warn("Unable to pre-generate milestone edit pages:", error.message);
     return [];

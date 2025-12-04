@@ -40,7 +40,7 @@ async function getMilestonesForProject(projectId) {
     const milestones = res.data.data || res.data || [];
 
     return milestones.filter(
-      (m) => m.project?.id?.toString() === projectId.toString()
+      (milestone) => milestone.project?.id?.toString() === projectId.toString()
     );
   } catch (error) {
     console.warn("Unable to load milestones for project:", error.message);
@@ -50,7 +50,7 @@ async function getMilestonesForProject(projectId) {
 
 // Project detail page 
 export default async function ProjectDetail({ params }) {
-  const { id } = params;
+  const { id } = await params;
 
   const project = await getProject(id);
   const createdAt = project.created?.human || project.created_at;

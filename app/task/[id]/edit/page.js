@@ -6,7 +6,7 @@ import EditTaskClient from "./EditTaskClient";
 import api from "../../../../lib/api";
 
 export default async function EditTaskPage({ params }) {
-  const { id } = params; 
+  const { id } = await params; 
   // Render the client component and give it the task id
   return <EditTaskClient id={id} />;
 }
