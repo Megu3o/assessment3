@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "../../../../lib/api";
 import ProjectForm from "../../components/ProjectForm";
+import StatusMessage from "../../components/StatusMessage";
 
 export default function EditProjectClient({ id }) {
   const router = useRouter();
@@ -20,10 +21,10 @@ export default function EditProjectClient({ id }) {
       try {
         setIsLoading(true);
         setError("");
-
+        // Get the current project from the API
         const res = await api.get(`/projects/${id}`);
         const project = res.data.data || res.data;
-
+         // Prefill the form
         setForm({
           name: project.name || "",
           description: project.description || "",
@@ -40,7 +41,7 @@ export default function EditProjectClient({ id }) {
     }
   }, [id]);
 
-  // Handle form change
+  // When a form field changes, update that one field
   const handleFormChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
@@ -68,24 +69,14 @@ export default function EditProjectClient({ id }) {
   };
 
   return (
-    <main className="min-h-[80vh] bg-blue-50/60 px-4 py-10">
+    <main className="min-h-[80vh] px-4 py-10">
       <div className="mx-auto max-w-2xl">
         <h1 className="mb-6 text-2xl font-bold text-slate-900">
           Edit Project
         </h1>
 
-        {error && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            <p className="font-semibold">Unable to edit project</p>
-            <p>{error}</p>
-          </div>
-        )}
-        {!error && success && (
-          <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
-            <p className="font-semibold">Success</p>
-            <p>{success}</p>
-          </div>
-        )}
+        {/* Status messages */}
+        <StatusMessage error={error} success={success} />
 
       <ProjectForm
         form={form}

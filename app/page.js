@@ -37,7 +37,7 @@ export default function HomePage() {
                 Manage Projects
               </h2>
               <p className="text-lg text-emerald-900/80">
-                Select a project to view its details and manage related tasks.
+                Select a project to view its details and manage related tasks and milestones
               </p>
             </div>
           </Link>

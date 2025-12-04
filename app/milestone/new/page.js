@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import api from "../../../lib/api";
 import MilestoneForm from "../components/MilestoneForm";
 import StatusMessage from "../../project/components/StatusMessage";
+import Link from "next/link";
 
 export default function NewMilestonePage() {
   const searchParams = useSearchParams();
@@ -71,6 +72,13 @@ export default function NewMilestonePage() {
         onChange={handleFormChange}
         onSubmit={handleSubmit}
       />
+      {/* Back link */}
+        <Link
+          href="/milestone"
+          className="text-sm text-blue-700 hover:underline"
+        >
+          ← Back to Milestones
+        </Link>
     </div>
   );
 }

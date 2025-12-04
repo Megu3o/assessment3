@@ -2,15 +2,13 @@
 import api from "../../../../lib/api";
 import EditProjectClient from "./EditProjectClient";
 
-// Server component: just passes id into the client component
+// Server component just passes id into the client component
 export default function EditProjectPage({ params }) {
   const { id } = params;
   return <EditProjectClient id={id} />;
 }
 
-/**
- * Next needs this for output: "export" because [id] is a dynamic route.
- */
+
 export async function generateStaticParams() {
   if (
     !process.env.NEXT_PUBLIC_API_URL ||

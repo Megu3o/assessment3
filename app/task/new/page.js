@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import api from "../../../lib/api";
 import TaskForm from "../components/TaskForm";
 import StatusMessage from "../../project/components/StatusMessage";
+import Link from "next/link";
 
 
 // Page for creating a new task
@@ -74,9 +75,19 @@ export default function NewTaskPage() {
       <TaskForm
         form={form}
         isLoading={isLoading}
+        editingId={null} // create mode 
         onChange={handleFormChange}
         onSubmit={handleSubmit}
       />
+
+        {/* Back link */}
+        <Link
+          href="/task"
+          className="text-sm text-blue-700 hover:underline"
+        >
+          ← Back to Tasks
+        </Link>
+
     </div>
   );
 }

@@ -4,7 +4,8 @@
 import { useEffect, useState } from "react";
 import api from "../../lib/api";
 import TaskCard from "../task/components/TaskCard";
-import LoadingText from "../project/components/StatusMessage";
+import LoadingText from "../project/components/LoadingText";
+import StatusMessage from "../project/components/StatusMessage";
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState([]);
@@ -47,7 +48,7 @@ export default function TasksPage() {
       await api.delete(`/tasks/${id}`);
 
       // remove from local state
-      const newList = tasks.filter((t) => t.id !== id);
+      const newList = tasks.filter((task) => task.id !== id);
       setTasks(newList);
 
       setSuccess("Task deleted successfully.");
@@ -58,41 +59,36 @@ export default function TasksPage() {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="mb-4 text-2xl font-bold">Tasks</h1>
-
-      {/* Status messages */}
-      {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          <p className="font-semibold">Unable to complete the action</p>
-          <p>{error}</p>
+    <main className="min-h-[80vh] px-10 py-20">
+      <div className="mx-auto w-full max-w-5xl">
+        <div className="mb-8 flex flex-col items-center gap-4">
+          <h1 className="text-4xl font-bold text-blue-900 text-center">
+            Tasks
+          </h1>
         </div>
-      )}
-      {!error && success && (
-        <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
-          <p className="font-semibold">Success</p>
-          <p>{success}</p>
+
+        {/* Status messages */}
+        <StatusMessage error={error} success={success} />
+
+        {/* Loading indicator */}
+        <LoadingText isLoading={isLoading} text="Loading tasks..." />
+
+        {/* Task list */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {tasks.map((task) => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              onDelete={() => handleDelete(task.id)}
+            />
+          ))}
+
+          {!isLoading && tasks.length === 0 && !error && (
+            <p className="text-sm text-gray-600">No tasks found.</p>
+          )}
+        
         </div>
-      )}
-
-      {/* Loading indicator */}
-      <LoadingText isLoading={isLoading} text="Loading tasks..." />
-
-      {/* Task list */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {tasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            onDelete={() => handleDelete(task.id)}
-          />
-
-        ))}
-
-        {!isLoading && tasks.length === 0 && !error && (
-          <p className="text-sm text-gray-500">No tasks found.</p>
-        )}
       </div>
-    </div>
+    </main>
   );
 }

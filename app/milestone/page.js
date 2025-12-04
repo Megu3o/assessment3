@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import api from "../../lib/api.js";
-import MilestoneCard from "./components/MilestoneCard.js";
-import LoadingText from "../project/components/LoadingText.js";
-import StatusMessage from "../project/components/StatusMessage.js";
+import api from "../../lib/api";
+import MilestoneCard from "./components/MilestoneCard";
+import LoadingText from "../project/components/LoadingText";
+import StatusMessage from "../project/components/StatusMessage";
 
 export default function MilestonesPage() {
   const [milestones, setMilestones] = useState([]);
@@ -47,7 +47,7 @@ export default function MilestonesPage() {
 
       await api.delete(`/milestones/${id}`);
 
-      const newList = milestones.filter((m) => m.id !== id);
+      const newList = milestones.filter((milestone) => milestone.id !== id);
       setMilestones(newList);
 
       setSuccess("Milestone deleted successfully.");
@@ -58,8 +58,13 @@ export default function MilestonesPage() {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="mb-4 text-2xl font-bold">Milestones</h1>
+  <main className="min-h-[80vh] px-10 py-20">
+    <div className="mx-auto w-full max-w-5xl">
+      <div className="mb-8 flex flex-col items-center gap-4">
+        <h1 className="text-4xl font-bold text-blue-900 text-center">
+          Milestones
+        </h1>
+      </div>
 
       {/* Status messages */}
       <StatusMessage error={error} success={success} />
@@ -82,5 +87,7 @@ export default function MilestonesPage() {
         )}
       </div>
     </div>
-  );
+  </main>
+);
+
 }

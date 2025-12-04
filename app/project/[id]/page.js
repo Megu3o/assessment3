@@ -1,8 +1,11 @@
+// app/project/[id]/page.js
+
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import api from "../../../lib/api";
 import ProjectDetailCard from "../components/ProjectDetailCard";
 
+// Get a single project
 async function getProject(id) {
   try {
     const res = await api.get(`/projects/${id}`);
@@ -15,14 +18,50 @@ async function getProject(id) {
   }
 }
 
+// Get tasks that belong to this project
+async function getTasksForProject(projectId) {
+  try {
+    const res = await api.get("/tasks");
+    const tasks = res.data.data || res.data || [];
+
+    return tasks.filter(
+      (task) => task.project?.id?.toString() === projectId.toString()
+    );
+  } catch (error) {
+    console.warn("Unable to load tasks for project:", error.message);
+    return [];
+  }
+}
+
+// Get milestones that belong to this project
+async function getMilestonesForProject(projectId) {
+  try {
+    const res = await api.get("/milestones");
+    const milestones = res.data.data || res.data || [];
+
+    return milestones.filter(
+      (m) => m.project?.id?.toString() === projectId.toString()
+    );
+  } catch (error) {
+    console.warn("Unable to load milestones for project:", error.message);
+    return [];
+  }
+}
+
+// Project detail page 
 export default async function ProjectDetail({ params }) {
-  // params is already a plain object – no need for await
   const { id } = params;
+
   const project = await getProject(id);
   const createdAt = project.created?.human || project.created_at;
 
+  const [tasks, milestones] = await Promise.all([
+    getTasksForProject(id),
+    getMilestonesForProject(id),
+  ]);
+
   return (
-    <main className="min-h-[80vh] bg-blue-50/60 px-4 py-10">
+    <main className="min-h-[80vh]  px-4 py-10">
       <div className="mx-auto max-w-3xl space-y-6">
         {/* Back link */}
         <Link
@@ -32,17 +71,28 @@ export default async function ProjectDetail({ params }) {
           ← Back to projects
         </Link>
 
-        {/* Project detail card */}
-        <ProjectDetailCard project={project} createdAt={createdAt} />
+        {/* Project detail card with tasks & milestones inside */}
+        <ProjectDetailCard
+          project={project}
+          createdAt={createdAt}
+          tasks={tasks}
+          milestones={milestones}
+        />
 
-        {/* Task actions */}
-        <div className="mt-6 flex flex-wrap gap-3">
-          {/* Pass project ID in the query string */}
+      {/* Actions */}
+        <div className="mt-4 flex flex-wrap gap-3">
           <Link
             href={`/task/new?project=${project.id}`}
-            className="inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
+            className="inline-flex items-center justify-center rounded-full border border-blue-200 bg-blue-50 px-5 py-2 text-sm font-semibold text-blue-800 hover:bg-blue-100"
           >
             Add Task for this Project
+          </Link>
+
+          <Link
+            href={`/milestone/new?project=${project.id}`}
+            className="inline-flex items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-5 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-100"
+          >
+            Add Milestone for this Project
           </Link>
         </div>
       </div>
@@ -50,6 +100,7 @@ export default async function ProjectDetail({ params }) {
   );
 }
 
+// Pre-generate static project pages
 export async function generateStaticParams() {
   if (
     !process.env.NEXT_PUBLIC_API_URL ||
@@ -57,9 +108,11 @@ export async function generateStaticParams() {
   ) {
     return [];
   }
+
   try {
     const res = await api.get("/projects");
     const projects = res.data.data || res.data || [];
+
     return projects
       .filter((project) => project?.id)
       .map((project) => ({ id: project.id.toString() }));

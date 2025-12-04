@@ -5,8 +5,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "../../../lib/api";
 import ProjectForm from "../components/ProjectForm";
+import StatusMessage from "../../project/components/StatusMessage";
 
-// Simple helper to wait for a given time (ms)
+// Helper to wait for a given time 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default function NewProjectPage() {
@@ -47,11 +48,6 @@ export default function NewProjectPage() {
     }
   };
 
-  // const handleCancel = () => {
-  //   setForm({ name: "", description: "" });
-  //   setError("");
-  //   setSuccess("");
-  // };
 
   return (
     <main className="min-h-[80vh] bg-blue-50/60 px-4 py-10 flex items-center justify-center">
@@ -63,19 +59,7 @@ export default function NewProjectPage() {
         </h1>
 
         {/* Status messages */}
-        {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
-            <p className="font-semibold">Unable to create project</p>
-            <p>{error}</p>
-          </div>
-        )}
-        {!error && success && (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-800">
-            <p className="font-semibold">Success</p>
-            <p>{success}</p>
-          </div>
-        )}
-
+        <StatusMessage error={error} success={success} />
         {/* Project Form (ProjectForm conponent) */}
         <div className="rounded-3xl border border-blue-100 bg-white/95 p-8 shadow-[0_18px_45px_rgba(37,99,235,0.18)]">
           <ProjectForm
@@ -86,6 +70,7 @@ export default function NewProjectPage() {
             // onCancel={handleCancel}
           />
         </div>
+        
       </div>
     </main>
   );

@@ -31,7 +31,7 @@ export default function ProjectCard({ project, onDelete }) {
           View Details
         </Link>
 
-        {/* Edit project – this is where the edit page is used */}
+        {/* Edit button */}
         <Link
           href={`/project/${project.id}/edit`}
           className="inline-flex items-center justify-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 hover:bg-amber-100"
@@ -39,7 +39,7 @@ export default function ProjectCard({ project, onDelete }) {
           Edit
         </Link>
 
-        {/* Delete, only if onDelete was passed in */}
+        {/* Delete button */}
         {onDelete && (
           <button
             type="button"

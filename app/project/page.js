@@ -2,9 +2,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";  
 import api from "../../lib/api";
 import ProjectCard from "./components/ProjectCard";
+import StatusMessage from "../project/components/StatusMessage";
+import LoadingText from "./components/LoadingText";
 
 export default function ProjectListPage() {
   const [projects, setProjects] = useState([]);
@@ -12,34 +13,40 @@ export default function ProjectListPage() {
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const router = useRouter(); 
 
-  const loadProjects = async (message = "") => {
-    try {
-      setIsLoading(true);
-      setError("");
-      if (!message) {
-        setSuccess("");
-      }
+// load all the projects form API
+  const fetchProjects = (message = "") => {
 
-      const res = await api.get("/projects");
+  setIsLoading(true);
+  setError("");
+  if (!message) {
+    setSuccess("");
+  }
+
+  return api
+    .get("/projects")
+    .then((res) => {
       const data = res.data.data || res.data || [];
       setProjects(data);
-
       if (message) {
-        setSuccess(message);
+        setSuccess(message); // show success text if provided
       }
-    } catch (err) {
+      setError(""); 
+    })
+    .catch((err) => {
       setError(err.message || "Error loading projects.");
       setSuccess("");
-    } finally {
+    })
+    .finally(() => {
       setIsLoading(false);
-    }
-  };
+    });
+};
 
-  useEffect(() => {
-    loadProjects("Projects loaded successfully.");
-  }, []);
+// Load projects once on first render
+useEffect(() => {
+  fetchProjects("Projects loaded successfully.");
+}, []);
+
 
   // Delete handler
   const handleDelete = async (id) => {
@@ -51,7 +58,7 @@ export default function ProjectListPage() {
 
       await api.delete(`/projects/${id}`);
 
-      setProjects((prev) => prev.filter((p) => p.id !== id));
+      setProjects((prev) => prev.filter((project) => project.id !== id));
       setSuccess("Project deleted successfully.");
     } catch (err) {
       setError(err.message || "Error deleting project.");
@@ -60,12 +67,9 @@ export default function ProjectListPage() {
   };
 
 
-  const handleEdit = (id) => {
-    router.push(`/project/${id}`);
-  };
 
   return (
-    <main className="min-h-[80vh] bg-blue-50/60 px-20 py-10">
+    <main className="min-h-[80vh] px-10 py-20">
       <div className="mx-auto w-full max-w-5xl">
         <div className="mb-8 flex flex-col items-center gap-4">
           <h1 className="text-4xl font-bold text-blue-900 text-center">
@@ -73,29 +77,17 @@ export default function ProjectListPage() {
           </h1>
         </div>
 
-        {error && (
-          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            <p className="font-semibold">Unable to load projects</p>
-            <p>{error}</p>
-          </div>
-        )}
-        {!error && success && (
-          <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
-            <p className="font-semibold">Success</p>
-            <p>{success}</p>
-          </div>
-        )}
-
-        {isLoading && (
-          <p className="mb-4 text-sm text-gray-600">Loading projects...</p>
-        )}
+        {/* Status messages */}
+        <StatusMessage error={error} success={success} />
+        
+         {/* Loading indicator */}
+        <LoadingText isLoading={isLoading} text="Loading projects..." />
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => (
             <ProjectCard
               key={project.id}
               project={project}
-              onEdit={() => handleEdit(project.id)} 
               onDelete={() => handleDelete(project.id)}   
             />
           ))}

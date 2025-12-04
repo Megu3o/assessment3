@@ -55,6 +55,12 @@ export default function RootLayout({ children }) {
               >
                 Task
               </Link>
+              <Link
+                href="/milestone"
+                className="hover:text-emerald-300 transition-colors"
+              >
+                Milestone
+              </Link>
 
             </div>
           </div>

@@ -33,7 +33,7 @@ export default function MilestoneForm({
           Description
         </label>
         <textarea
-          placeholder="Describe the milestone (optional)"
+          placeholder="Describe the milestone"
           value={form.description}
           onChange={(e) => onChange("description", e.target.value)}
           className="rounded border border-gray-300 p-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -88,7 +88,7 @@ export default function MilestoneForm({
           className="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
           disabled={isLoading}
         >
-          {editingId ? "Save Milestone" : "Add Milestone"}
+          {editingId ? "Save" : "Add"}
         </button>
       </div>
     </form>
