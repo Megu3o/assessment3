@@ -1,8 +1,8 @@
 import EditMilestoneClient from "./EditMilestoneClient";
 import api from "../../../../lib/api";
 
-export default async function EditMilestonePage({ params }) {
-  const { id } = await params;
+export default function EditMilestonePage({ params }) {
+  const { id } = params;
   return <EditMilestoneClient id={id} />;
 }
 
