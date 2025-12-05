@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
 import api from "../../../lib/api";
 import TaskForm from "../components/TaskForm";
 import StatusMessage from "../../project/components/StatusMessage";
@@ -11,9 +10,6 @@ import Link from "next/link";
 
 // Page for creating a new task
 export default function NewTaskPage() {
-  // Read query string from URL
-  const searchParams = useSearchParams();
-  const projectIdFromQuery = searchParams.get("project") || "";
   
    // Form state for the new task
   const [form, setForm] = useState({
@@ -21,7 +17,7 @@ export default function NewTaskPage() {
     description: "",
     status: "todo",
     dueDate: "",
-    projectId: projectIdFromQuery, 
+    projectId: "", 
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -55,7 +51,7 @@ export default function NewTaskPage() {
         description: "",
         status: "todo",
         dueDate: "",
-        projectId: projectIdFromQuery, 
+        projectId: "", 
       });
     } catch (err) {
       setError(err.message || "Error creating task.");

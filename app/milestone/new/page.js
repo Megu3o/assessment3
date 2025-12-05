@@ -1,22 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
 import api from "../../../lib/api";
 import MilestoneForm from "../components/MilestoneForm";
 import StatusMessage from "../../project/components/StatusMessage";
 import Link from "next/link";
 
 export default function NewMilestonePage() {
-  const searchParams = useSearchParams();
-  const projectIdFromQuery = searchParams.get("project") || "";
 
   const [form, setForm] = useState({
     title: "",
     description: "",
     dueDate: "",
     completedAt: "",
-    projectId: projectIdFromQuery, 
+    projectId: "", 
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -48,7 +45,7 @@ export default function NewMilestonePage() {
         description: "",
         dueDate: "",
         completedAt: "",
-        projectId: projectIdFromQuery,
+        projectId: "",
       });
     } catch (err) {
       setError(err.message || "Error creating milestone.");
